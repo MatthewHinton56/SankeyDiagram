@@ -38,7 +38,6 @@ public class Cohort {
 		URMMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
 		NONURMMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
 		inDepartmentPerYear = new ArrayList<Integer>();
-		generateMapsAndLists();
 
 		totalStudents = new ArrayList<Student>();
 		maleStudents = new ArrayList<Student>();
@@ -48,7 +47,7 @@ public class Cohort {
 
 		Workbook workbook = null;
 		try {
-			workbook = WorkbookFactory.create(new File("SankeyData.xlsx"));
+			workbook = WorkbookFactory.create(file);
 		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -57,9 +56,12 @@ public class Cohort {
 		DataFormatter dataFormatter = new DataFormatter();
 		Iterator<Row> rowIterator = cohort.rowIterator();
 		Row row1 = rowIterator.next();
+		rowIterator.next();
 		baseYear = Integer.parseInt(dataFormatter.formatCellValue(row1.getCell(0)));
 		departmentName = dataFormatter.formatCellValue(row1.getCell(1));
 		department = Department.DEPARTMENTS.get(departmentName);
+		generateMapsAndLists();
+		//System.out.println(department);
 		while(rowIterator.hasNext()) {
 			Row row = rowIterator.next();
 			Iterator<Cell> cellIterator = row.cellIterator();
@@ -83,6 +85,7 @@ public class Cohort {
 				incrementMajorCounts(year, major, gender, URM);
 				if(department.hasMajor(major))
 					inDepartmentPerYear.set(year, inDepartmentPerYear.get(year)+1);
+				System.out.println(major);
 			}
 			assignStudent(s);
 		}
@@ -110,30 +113,32 @@ public class Cohort {
 		// TODO Auto-generated method stub
 
 		if(totalMajorCountsPerYear.get(year).containsKey(major))
-			totalMajorCountsPerYear.get(year).put(major, totalMajorCountsPerYear.get(year).get(major));
+		{
+			totalMajorCountsPerYear.get(year).put(major, totalMajorCountsPerYear.get(year).get(major)+1);
+		}
 		else
 			totalMajorCountsPerYear.get(year).put(major, 1);
 
 		if(URM) {
 			if(URMMajorCountsPerYear.get(year).containsKey(major))
-				URMMajorCountsPerYear.get(year).put(major, URMMajorCountsPerYear.get(year).get(major));
+				URMMajorCountsPerYear.get(year).put(major, URMMajorCountsPerYear.get(year).get(major)+1);
 			else
 				URMMajorCountsPerYear.get(year).put(major, 1);
 		} else {
 			if(NONURMMajorCountsPerYear.get(year).containsKey(major))
-				NONURMMajorCountsPerYear.get(year).put(major, NONURMMajorCountsPerYear.get(year).get(major));
+				NONURMMajorCountsPerYear.get(year).put(major, NONURMMajorCountsPerYear.get(year).get(major)+1);
 			else
 				NONURMMajorCountsPerYear.get(year).put(major, 1);
 		}
 
 		if(gender.equals(Student.MALE)) {
 			if(MaleMajorCountsPerYear.get(year).containsKey(major))
-				MaleMajorCountsPerYear.get(year).put(major, MaleMajorCountsPerYear.get(year).get(major));
+				MaleMajorCountsPerYear.get(year).put(major, MaleMajorCountsPerYear.get(year).get(major)+1);
 			else
 				MaleMajorCountsPerYear.get(year).put(major, 1);
 		} else {
 			if(FemaleMajorCountsPerYear.get(year).containsKey(major))
-				FemaleMajorCountsPerYear.get(year).put(major, FemaleMajorCountsPerYear.get(year).get(major));
+				FemaleMajorCountsPerYear.get(year).put(major, FemaleMajorCountsPerYear.get(year).get(major)+1);
 			else
 				FemaleMajorCountsPerYear.get(year).put(major, 1);
 		}
@@ -165,11 +170,13 @@ public class Cohort {
 
 		@Override
 		public int compare(String o1, String o2) {
+			if(o1.equals(o2))
+				return 0;
 			boolean o1IsDismissed = Department.isDismissed(o1);
 			boolean o2IsDismissed = Department.isDismissed(o2);
-			if(!o1IsDismissed)
+			if(o1IsDismissed)
 				return -1;
-			if(!o2IsDismissed)
+			if(o2IsDismissed)
 				return 1;
 
 			boolean o1IsDropOut = Department.isDropOut(o1);
@@ -177,7 +184,7 @@ public class Cohort {
 
 			if(o1IsDropOut)
 				return -1;
-			if(!o2IsDropOut)
+			if(o2IsDropOut)
 				return 1;
 
 			boolean o1IsCNS = Department.isCNS(o1);
@@ -186,10 +193,10 @@ public class Cohort {
 				return -1;
 			if(!o2IsCNS)
 				return 1;
-
+			//System.out.println(department);
 			boolean o1IsDepartment = department.hasMajor(o1);
 			boolean o2IsDepartment = department.hasMajor(o2);
-			if(o1IsDepartment)
+			if(!o1IsDepartment)
 				return -1;
 			if(!o2IsDepartment)
 				return 1;
@@ -306,7 +313,26 @@ public class Cohort {
 		return NONURMCount;
 	}
 
-	
+
+
+	@Override
+	public String toString() {
+		return "Cohort [totalStudents=" + totalStudents + ", maleStudents=" + maleStudents + ", femaleStudents="
+				+ femaleStudents + ", URMStudents=" + URMStudents + ", NONURMStudents=" + NONURMStudents
+				+ ", department=" + department + ", departmentName=" + departmentName + ", baseYear=" + baseYear
+				+ ", totalMajorCountsPerYear=" + totalMajorCountsPerYear + ", MaleMajorCountsPerYear="
+				+ MaleMajorCountsPerYear + ", FemaleMajorCountsPerYear=" + FemaleMajorCountsPerYear
+				+ ", URMMajorCountsPerYear=" + URMMajorCountsPerYear + ", NONURMMajorCountsPerYear="
+				+ NONURMMajorCountsPerYear + ", inDepartmentPerYear=" + inDepartmentPerYear + ", maleCount=" + maleCount
+				+ ", femaleCount=" + femaleCount + ", URMCount=" + URMCount + ", NONURMCount=" + NONURMCount + "]";
+	}
+
+	public static void main(String[] args) throws InvalidFormatException, IOException {
+		Department.generateDepartments();
+		Cohort cohort = new Cohort(new File("CSCohortTest.xlsx"));
+		//System.out.println(cohort);
+		System.out.println(cohort.getTotalMajorCountsPerYear());
+	}
 	
 }
 
