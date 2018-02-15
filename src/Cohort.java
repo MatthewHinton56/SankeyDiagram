@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -29,22 +30,32 @@ public class Cohort {
 	private int femaleCount;
 	private int URMCount;
 	private int NONURMCount;
-
+	private Map<String, Integer> totalMajorCountsInitial,MaleMajorCountsInitial, FemaleMajorCountsInitial, URMMajorCountsInitial,NONURMMajorCountsInitial;
+	private Set<String> majors;
+	//Add Intial major Map
+	
 	public Cohort(File file) {
 
+		try {
+			Department.generateDepartments();
+		} catch (InvalidFormatException | IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		totalMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
 		MaleMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
 		FemaleMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
 		URMMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
 		NONURMMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
 		inDepartmentPerYear = new ArrayList<Integer>();
-
+		
 		totalStudents = new ArrayList<Student>();
 		maleStudents = new ArrayList<Student>();
 		femaleStudents = new ArrayList<Student>();
 		URMStudents = new ArrayList<Student>();
 		NONURMStudents = new ArrayList<Student>();
-
+		majors = new HashSet<String>();
 		Workbook workbook = null;
 		try {
 			workbook = WorkbookFactory.create(file);
@@ -61,7 +72,6 @@ public class Cohort {
 		departmentName = dataFormatter.formatCellValue(row1.getCell(1));
 		department = Department.DEPARTMENTS.get(departmentName);
 		generateMapsAndLists();
-		//System.out.println(department);
 		while(rowIterator.hasNext()) {
 			Row row = rowIterator.next();
 			Iterator<Cell> cellIterator = row.cellIterator();
@@ -77,19 +87,65 @@ public class Cohort {
 			else
 				NONURMCount++;
 			String initialMajor = dataFormatter.formatCellValue(cellIterator.next());
+			majors.add(initialMajor);
+			incrementIntitialCount(initialMajor,gender,URM);
 			Student s = new Student(id,gender,URM,initialMajor);
 			int year = 0;
 			while(cellIterator.hasNext()) {
 				String major = dataFormatter.formatCellValue(cellIterator.next());
+				majors.add(major);
 				s.addYear(major);
 				incrementMajorCounts(year, major, gender, URM);
 				if(department.hasMajor(major))
 					inDepartmentPerYear.set(year, inDepartmentPerYear.get(year)+1);
-				System.out.println(major);
+				year++;
 			}
 			assignStudent(s);
+			
 		}
 
+	}
+
+
+
+	public Set<String> getMajors() {
+		return majors;
+	}
+
+
+
+	private void incrementIntitialCount(String major, String gender, boolean URM) {
+		if(totalMajorCountsInitial.containsKey(major))
+		{
+			totalMajorCountsInitial.put(major, totalMajorCountsInitial.get(major)+1);
+		}
+		else
+			totalMajorCountsInitial.put(major, 1);
+
+		if(URM) {
+			if(URMMajorCountsInitial.containsKey(major))
+				URMMajorCountsInitial.put(major, URMMajorCountsInitial.get(major)+1);
+			else
+				URMMajorCountsInitial.put(major, 1);
+		} else {
+			if(NONURMMajorCountsInitial.containsKey(major))
+				NONURMMajorCountsInitial.put(major, NONURMMajorCountsInitial.get(major)+1);
+			else
+				NONURMMajorCountsInitial.put(major, 1);
+		}
+
+		if(gender.equals(Student.MALE)) {
+			if(MaleMajorCountsInitial.containsKey(major))
+				MaleMajorCountsInitial.put(major, MaleMajorCountsInitial.get(major)+1);
+			else
+				MaleMajorCountsInitial.put(major, 1);
+		} else {
+			if(FemaleMajorCountsInitial.containsKey(major))
+				FemaleMajorCountsInitial.put(major, FemaleMajorCountsInitial.get(major)+1);
+			else
+				FemaleMajorCountsInitial.put(major, 1);
+		}
+		
 	}
 
 
@@ -156,6 +212,11 @@ public class Cohort {
 			NONURMMajorCountsPerYear.add(new TreeMap<String,Integer>(new MajorComparator(department)));
 			inDepartmentPerYear.add(0);
 		}	
+		totalMajorCountsInitial = new TreeMap<String, Integer>(new MajorComparator(department));
+		MaleMajorCountsInitial = new TreeMap<String, Integer>(new MajorComparator(department));
+		FemaleMajorCountsInitial = new TreeMap<String, Integer>(new MajorComparator(department));
+		URMMajorCountsInitial = new TreeMap<String, Integer>(new MajorComparator(department));
+		NONURMMajorCountsInitial = new TreeMap<String, Integer>(new MajorComparator(department));
 	}
 
 
@@ -314,6 +375,33 @@ public class Cohort {
 	}
 
 
+	public Map<String, Integer> getTotalMajorCountsInitial() {
+		return totalMajorCountsInitial;
+	}
+
+
+
+	public Map<String, Integer> getMaleMajorCountsInitial() {
+		return MaleMajorCountsInitial;
+	}
+
+
+
+	public Map<String, Integer> getFemaleMajorCountsInitial() {
+		return FemaleMajorCountsInitial;
+	}
+
+
+
+	public Map<String, Integer> getURMMajorCountsInitial() {
+		return URMMajorCountsInitial;
+	}
+
+
+
+	public Map<String, Integer> getNONURMMajorCountsInitial() {
+		return NONURMMajorCountsInitial;
+	}
 
 	@Override
 	public String toString() {
@@ -324,17 +412,17 @@ public class Cohort {
 				+ MaleMajorCountsPerYear + ", FemaleMajorCountsPerYear=" + FemaleMajorCountsPerYear
 				+ ", URMMajorCountsPerYear=" + URMMajorCountsPerYear + ", NONURMMajorCountsPerYear="
 				+ NONURMMajorCountsPerYear + ", inDepartmentPerYear=" + inDepartmentPerYear + ", maleCount=" + maleCount
-				+ ", femaleCount=" + femaleCount + ", URMCount=" + URMCount + ", NONURMCount=" + NONURMCount + "]";
+				+ ", femaleCount=" + femaleCount + ", URMCount=" + URMCount + ", NONURMCount=" + NONURMCount
+				+ ", totalMajorCountsInitial=" + totalMajorCountsInitial + ", MaleMajorCountsInitial="
+				+ MaleMajorCountsInitial + ", FemaleMajorCountsInitial=" + FemaleMajorCountsInitial
+				+ ", URMMajorCountsInitial=" + URMMajorCountsInitial + ", NONURMMajorCountsInitial="
+				+ NONURMMajorCountsInitial + "]";
 	}
 
 	public static void main(String[] args) throws InvalidFormatException, IOException {
-		Department.generateDepartments();
 		Cohort cohort = new Cohort(new File("CSCohortTest.xlsx"));
-		//System.out.println(cohort);
-		System.out.println(cohort.getTotalMajorCountsPerYear());
+		System.out.println(cohort);
+		//System.out.println(cohort.getTotalMajorCountsPerYear());
 	}
 	
 }
-
-
-

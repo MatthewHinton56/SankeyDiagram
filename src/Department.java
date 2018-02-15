@@ -13,8 +13,8 @@ import java.util.Set;
 
 public class Department {
 
-	public static final String dismissed = "DISMISSED";
-	public static final String dropOut = "DROPOUT";
+	public static final String DISMISSED = "Dismissed";
+	public static final String DROPOUT = "DropOut";
 	
 	
 	private String departmentName;
@@ -69,11 +69,15 @@ public class Department {
 	}
 	
 	public static boolean isDismissed(String major) {
-		return major.equals(Department.dismissed);
+		return major.equals(Department.DISMISSED);
 	}
 	
 	public static boolean isDropOut(String major) {
-		return major.equals(Department.dropOut);
+		return major.equals(Department.DROPOUT);
+	}
+	
+	public static boolean isMajor(String major) {
+		return !isDropOut(major) && !isDismissed(major);
 	}
 	
 	
