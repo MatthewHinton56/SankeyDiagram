@@ -12,8 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 
-import VisualizationMenu.SaveMenu;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem ;
@@ -233,14 +231,24 @@ public class VisualizationMenu extends JMenuBar {
 			}
 		}
 		this.add(college);
-		JMenu otherColleges = new JMenu("Other Collegs");
+		JMenu otherColleges = new JMenu("Other Colleges");
 		for(String s: majors) {
-			if(!d.hasMajor(s) && !Department.isCNS(s)) {
+			if(!d.hasMajor(s) && !Department.isCNS(s) && Department.isMajor(s)) {
 				JCheckBoxMenuItem  major = new JCheckBoxMenuItem (s);
 				major.addItemListener(new VisualItemListener(this,v));
 				otherColleges.add(major);
 			}
 		}
 		this.add(otherColleges);
+		JMenu other = new JMenu("Other");
+		for(String s: majors) {
+			if(!d.hasMajor(s) && !Department.isCNS(s) && !Department.isMajor(s)) {
+				JCheckBoxMenuItem  major = new JCheckBoxMenuItem (s);
+				major.addItemListener(new VisualItemListener(this,v));
+				other.add(major);
+			}
+		}
+		this.add(other);
+		
 	}
 }

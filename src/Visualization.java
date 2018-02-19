@@ -47,15 +47,15 @@ public class Visualization extends JPanel{
 		this.addMouseMotionListener(new VisualMouseListener());
 		this.addMouseListener(new VisualMouseClickListener());
 		JFileChooser chooser = new JFileChooser();
-		File selectedFile = new File("CSCohortTest.xlsx");
+		File selectedFile = null;
 		selectionType = "Major Selection";
 		clickOn = true;
 		hoverOn = true;
-		System.out.println((new Color(192,192,192)).getRGB());
-		/*if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+		//System.out.println((new Color(192,192,192)).getRGB());
+		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
 		selectedFile = chooser.getSelectedFile();
-		}*/
+		}
 		cohort  = new Cohort(selectedFile);
 		displayCohort = cohort;
 		generateStudentTowers(displayCohort.getTotalStudents());
@@ -115,10 +115,10 @@ public class Visualization extends JPanel{
 
 
 	private void constructStudentTowerMap(int dy) {
-		System.out.println("here");
+		//System.out.println("here");
 		int x = 50;
 		int y = 200;
-		System.out.println(dy);
+		//System.out.println(dy);
 		for(ArrayList<Student> students: studentTowers) {
 			for(Student s: students) {
 				for(int x0 = x; x0 < x+75; x0++)
@@ -153,7 +153,7 @@ public class Visualization extends JPanel{
 			g2.setColor(majorColors.get(major));
 			g2.fillRect(x, y, 20, 20);
 			g2.setColor(Color.BLACK);
-			g2.drawString(major, x+20, y);
+			g2.drawString(major, x+20, y+20);
 			y+=50;
 			if(y==200) {
 				y = 50;
@@ -212,7 +212,7 @@ public class Visualization extends JPanel{
 
 	public void constructSankeyTower(int x0, int y0,int total, Map<String, Integer> counts) {
 		for(String s: counts.keySet()) {
-			System.out.println(s);
+			//System.out.println(s);
 			Color c = majorColors.get(s);
 			int count = counts.get(s);
 			float percent = ((float)count)/total;
@@ -251,7 +251,7 @@ public class Visualization extends JPanel{
 
 	public int majorFinder(int x) {
 		int x0 = 50;
-		for(int i = 0; i < 7; i++) {
+		for(int i = 0; i < 8; i++) {
 			if(x0 < x && x0+75 > x)
 				return i-1;
 			x0+=200;
@@ -335,7 +335,7 @@ public class Visualization extends JPanel{
 							for(int dx = 0; dx < studentMap[0].length;dx++)
 								for(int dy = 0; dy < studentMap.length;dy++ ) {
 									if(currentStudent.equals(studentMap[dy][dx])) {
-										if(canvas.getRGB(dx, dy) != 0xc0c0c0)
+										if(canvas.getRGB(dx, dy) != -4144960)
 										canvas.setRGB(dx, dy, majorColors.get(currentStudent.getYear(Visualization.this.majorFinder(dx))).getRGB());
 									}
 									if(student != null && student.equals(studentMap[dy][dx])) {
@@ -500,13 +500,13 @@ class VisualItemListener implements ItemListener {
 					isInSubSet = hasMajor && isInSubSet;
 				}
 			}
-			System.out.println(isInSubSet);
+			//System.out.println(isInSubSet);
 			isInSubSet = isInSubSet && (URMSelectionS.equals("All") || s.isURM() == URMSelection);
 			if(isInSubSet)
 				temp.addStudent(s);
 		}
 		visual.displayCohort = temp;
-		System.out.println(temp);
+		//System.out.println(temp);
 		visual.redrawSankey();
 
 	}
@@ -523,7 +523,7 @@ class VisualItemListener implements ItemListener {
 				URMSelectionS = menuBar.getMenu(3).getItem(i).getText();
 		}
 		URMSelection = URMSelectionS.equals("URM");
-		System.out.println(URMSelectionS);
+		//System.out.println(URMSelectionS);
 		switch(genderSelection) {
 		case "Male": return cohort.getMaleStudents();
 		case "Female": return cohort.getFemaleStudents();
