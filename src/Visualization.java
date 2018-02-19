@@ -29,6 +29,8 @@ public class Visualization extends JPanel{
 	private static final int TOWERHEIGHT = 500;
 	private static final int TOWERWIDTH = 75;
 	private Map<String, Color> majorColors;
+	
+
 	public final Cohort cohort;
 	Cohort displayCohort;
 	private String[][] majorMap;
@@ -109,9 +111,28 @@ public class Visualization extends JPanel{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.drawImage(canvas, null, null);
+        drawKey(g2);
     }
     
-    public void putPixel(int x, int y) {
+
+    private void drawKey(Graphics2D g2) {
+    	int x = 50;
+    	int y = 50;
+		for(String major: displayCohort.getMajors()) {
+			g2.setColor(majorColors.get(major));
+			g2.fillRect(x, y, 20, 20);
+			g2.setColor(Color.BLACK);
+			g2.drawString(major, x+20, y);
+			y+=50;
+			if(y==200) {
+				y = 50;
+				x+=100;
+			}
+		}
+		
+	}
+
+	public void putPixel(int x, int y) {
     	canvas.setRGB(x, y, Color.BLACK.getRGB());
     }
     
@@ -262,7 +283,9 @@ public class Visualization extends JPanel{
 		this.repaint();
 	}
 	
-	
+	public Map<String, Color> getMajorColors() {
+		return majorColors;
+	}
 	
 }
 
@@ -283,7 +306,7 @@ public class Visualization extends JPanel{
 		ArrayList<Student> students = getSubset(visual.cohort);
 		for(Student s: students) {
 			boolean isInSubSet = true;
-			for(int i = 3; i < menuBar.getMenuCount() && isInSubSet; i++) {
+			for(int i = 4; i < menuBar.getMenuCount() && isInSubSet; i++) {
 				JMenu menu = menuBar.getMenu(i);
 				for(int q = 0; q < menu.getItemCount() && isInSubSet; q++) {
 					JCheckBoxMenuItem check = (JCheckBoxMenuItem)menu.getItem(q);
@@ -304,14 +327,14 @@ public class Visualization extends JPanel{
 
 	private ArrayList<Student> getSubset(Cohort cohort) {
 		String genderSelection = ""; 
-		for(int i = 0; i < menuBar.getMenu(1).getItemCount(); i++) {
-			if(menuBar.getMenu(1).getItem(i).isSelected()) 
-				genderSelection = menuBar.getMenu(1).getItem(i).getText();
-		}
-		URMSelectionS = "";
 		for(int i = 0; i < menuBar.getMenu(2).getItemCount(); i++) {
 			if(menuBar.getMenu(2).getItem(i).isSelected()) 
-				URMSelectionS = menuBar.getMenu(2).getItem(i).getText();
+				genderSelection = menuBar.getMenu(2).getItem(i).getText();
+		}
+		URMSelectionS = "";
+		for(int i = 0; i < menuBar.getMenu(3).getItemCount(); i++) {
+			if(menuBar.getMenu(3).getItem(i).isSelected()) 
+				URMSelectionS = menuBar.getMenu(3).getItem(i).getText();
 		}
 		URMSelection = URMSelectionS.equals("URM");
 		System.out.println(URMSelectionS);
