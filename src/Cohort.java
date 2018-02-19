@@ -106,8 +106,50 @@ public class Cohort {
 
 	}
 
+	public Cohort(int baseYear, String departmentName) {
+		totalMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
+		MaleMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
+		FemaleMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
+		URMMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
+		NONURMMajorCountsPerYear = new ArrayList<Map<String,Integer>>();
+		inDepartmentPerYear = new ArrayList<Integer>();
+		
+		totalStudents = new ArrayList<Student>();
+		maleStudents = new ArrayList<Student>();
+		femaleStudents = new ArrayList<Student>();
+		URMStudents = new ArrayList<Student>();
+		NONURMStudents = new ArrayList<Student>();
+		majors = new HashSet<String>();
+		this.baseYear = baseYear;
+		this.departmentName = departmentName;
+		department = Department.DEPARTMENTS.get(departmentName);
+		generateMapsAndLists();
+	}
 
-
+	public void addStudent(Student s) {
+		if(s.getGender().equals(Student.MALE))
+			maleCount++;
+		else 
+			femaleCount++;
+		boolean URM = s.isURM();
+		if(URM)
+			URMCount++;
+		else
+			NONURMCount++;
+		majors.add(s.getIntialMajor());
+		incrementIntitialCount(s.getIntialMajor(),s.getGender(),URM);
+		int year = 0;
+		for(String major: s.getMajorAfterEachYear()) {
+			majors.add(major);
+			incrementMajorCounts(year, major, s.getGender(), URM);
+			if(department.hasMajor(major))
+				inDepartmentPerYear.set(year, inDepartmentPerYear.get(year)+1);
+			year++;
+		}
+		assignStudent(s);
+	}
+	
+	
 	public Set<String> getMajors() {
 		return majors;
 	}

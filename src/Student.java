@@ -13,6 +13,10 @@ public class Student {
 	private String initialMajor;
 	private ArrayList<String> majorAfterEachYear;
 	
+	public ArrayList<String> getMajorAfterEachYear() {
+		return majorAfterEachYear;
+	}
+
 	public Student(String id, String gender, boolean uRM, String intialMajor) {
 		this.id = id;
 		this.gender = gender;
@@ -53,7 +57,9 @@ public class Student {
 		return this.id.equals(((Student)obj).id);
 	}
 
-	
+	public boolean hasMajor(String major) {
+		return major.equals(initialMajor) || majorAfterEachYear.contains(major);
+	}
 
 	
 }
@@ -70,13 +76,13 @@ class StudentComparator implements Comparator<Student>
 	@Override
 	public int compare(Student o1, Student o2) {
 		String major1, major2;
-		if(year != 6 && o1.getYear(year).equals(o2.getYear(year))) {
-			major1 = o1.getYear(year+1);
-			major2 = o2.getYear(year+1);
-		} else {
+		//if(year != 6 && o1.getYear(year).equals(o2.getYear(year))) {
+		//	major1 = o1.getYear(year+1);
+			//major2 = o2.getYear(year+1);
+	//	} else {
 			major1 = o1.getYear(year);
 			major2 = o2.getYear(year);
-		}
+		//}
 		
 		boolean major1IsDismissed = Department.isDismissed(major1);
 		boolean major2IsDismissed = Department.isDismissed(major2);
