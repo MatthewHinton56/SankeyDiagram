@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Set;
 
 import javax.swing.JMenu;
@@ -8,7 +10,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextField;
 
+import VisualizationMenu.SaveMenu;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -17,6 +21,35 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
 public class VisualizationMenu extends JMenuBar {
+
+	private class SaveMenu extends JFrame implements ActionListener{
+
+		private JTextField field;
+		private SankeyFrame sankeyFrame;
+
+		public SaveMenu(SankeyFrame sankeyFrame) {
+			this.sankeyFrame = sankeyFrame;
+			field = new JTextField(20);
+			JButton button = new JButton("Save");
+			button.addActionListener(this);
+			JPanel panel = new JPanel();
+			panel.add(field);
+			panel.add(button);
+			panel.setSize(400, 200);
+			this.add(panel);
+			this.pack();
+	        this.setVisible(true);
+	        this.setResizable(false);
+	        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String fileName = field.getText();
+			sankeyFrame.saveImage(fileName);
+		}
+
+	}
 
 	private class ColorChanger extends JFrame implements ActionListener {
 
@@ -63,10 +96,19 @@ public class VisualizationMenu extends JMenuBar {
 		}
 	}
 
-	public VisualizationMenu(Set<String> majors, Department d, Visualization v) {
+	public VisualizationMenu(Set<String> majors, Department d, Visualization v, SankeyFrame sankeyFrame) {
 		JMenu file = new JMenu("File");
 		JMenuItem  load = new JMenuItem ("Load");
 		JMenuItem  save = new JMenuItem ("Save");
+		save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new SaveMenu(sankeyFrame);
+				
+			}
+			
+		});
 		file.add(load);
 		file.add(save);
 		this.add(file);
@@ -81,7 +123,64 @@ public class VisualizationMenu extends JMenuBar {
 			}
 		
 		});
+		
+		
+		JRadioButtonMenuItem studentSelection = new JRadioButtonMenuItem("Student Selection");
+		studentSelection.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				v.selectionType = "Student Selection";
+				
+			}
+			
+		});
+		JRadioButtonMenuItem majorSelection = new JRadioButtonMenuItem("Major Selection");
+		majorSelection.setSelected(true);
+		studentSelection.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				v.selectionType = "Major Selection";
+				
+			}
+			
+		});
+		
+		ButtonGroup selectionGroup = new ButtonGroup();
+		selectionGroup.add(studentSelection);
+		selectionGroup.add(majorSelection);
 		edit.add(changeColor);
+		edit.addSeparator();
+		edit.add(majorSelection);
+		edit.add(studentSelection);
+		edit.addSeparator();
+		
+		JCheckBoxMenuItem clickOn = new JCheckBoxMenuItem("Click On");
+		clickOn.setSelected(true);
+		clickOn.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				v.clickOn = ((JCheckBoxMenuItem)VisualizationMenu.this.getMenu(1).getItem(5)).isSelected();
+				
+			}
+			
+		});
+		edit.add(clickOn);
+		JCheckBoxMenuItem hoverOn = new JCheckBoxMenuItem("Hover On");
+		hoverOn.setSelected(true);
+		hoverOn.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				v.hoverOn = ((JCheckBoxMenuItem)VisualizationMenu.this.getMenu(1).getItem(6)).isSelected();
+				
+			}
+			
+		});
+		edit.add(hoverOn);
+		
 		this.add(edit);
 		JMenu gender = new JMenu("Gender");
 		JRadioButtonMenuItem male = new JRadioButtonMenuItem("Male");
