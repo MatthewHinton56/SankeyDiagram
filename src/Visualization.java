@@ -67,6 +67,7 @@ public class Visualization extends JPanel{
 		fillCanvas(Color.WHITE);
 		towerConstruction(displayCohort.getTotalMajorCountsInitial(), displayCohort.getTotalMajorCountsPerYear(), displayCohort.getTotalStudents().size());
 		lineConstruction();
+		drawKeyShapes();
 	}
 
 	private void generateStudentTowers(ArrayList<Student> studentI) {
@@ -141,17 +142,33 @@ public class Visualization extends JPanel{
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawImage(canvas, null, null);
-		drawKey(g2);
+		drawKeyText(g2);
 		
 	}
 
-
-	private void drawKey(Graphics2D g2) {
+	private void drawKeyShapes() {
 		int x = 50;
 		int y = 50;
 		for(String major: displayCohort.getMajors()) {
-			g2.setColor(majorColors.get(major));
-			g2.fillRect(x, y, 20, 20);
+			Color c = majorColors.get(major);
+			System.out.println(c);
+			this.drawRectangle(x, y+20, x+20, y, c, major);
+		//	for(int x0 = x; x0 < x+20; x0++)
+			//	for(int y0 = y; y0 < y+20; y0++)
+				//	majorMap[y0][x0] = major;
+			y+=50;
+			if(y==200) {
+				y = 50;
+				x+=100;
+			}
+		}
+	}
+	
+
+	private void drawKeyText(Graphics2D g2) {
+		int x = 50;
+		int y = 50;
+		for(String major: displayCohort.getMajors()) {
 			g2.setColor(Color.BLACK);
 			g2.drawString(major, x+20, y+20);
 			y+=50;
@@ -256,11 +273,12 @@ public class Visualization extends JPanel{
 				return i-1;
 			x0+=200;
 		}
-		for(int q = 0; q < 7; q++) {
+		for(int q = 1; q < 8; q++) {
 			int xRight = 59 + 200 * q;
+			//System.out.println(xRight);
 			int xLeft = xRight - 134;
 			if(x > xLeft && x < xRight)
-				return q;
+				return q-1;
 		}
 		
 		
@@ -369,6 +387,9 @@ public class Visualization extends JPanel{
 		fillCanvas(Color.WHITE);
 		towerConstruction(displayCohort.getTotalMajorCountsInitial(), displayCohort.getTotalMajorCountsPerYear(), displayCohort.getTotalStudents().size());
 		lineConstruction();
+		drawKeyShapes();
+		this.getMouseListeners()[0].mouseExited(new MouseEvent(this, 0,0, height, height, height, height, clickOn));
+		//this.getMouseMotionListeners()[0].mouseMoved(new MouseEvent(this, 0,0, height, height, height, height, clickOn));
 		this.repaint();
 	}
 
@@ -470,7 +491,30 @@ public class Visualization extends JPanel{
 		public void mousePressed(MouseEvent e) {}
 		public void mouseReleased(MouseEvent e) {}
 		public void mouseEntered(MouseEvent e) {}
-		public void mouseExited(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {
+			if(selectionType.equals("Major Selection") && currentMajor != null) {
+				for(int dx = 0; dx < majorMap[0].length;dx++)
+					for(int dy = 0; dy < majorMap.length;dy++ ) {
+						if(currentMajor.equals(majorMap[dy][dx])) {
+							//System.out.println(dx+" "+dy);
+							canvas.setRGB(dx, dy, (new Color(192,192,192)).getRGB());
+						}
+
+					}
+			}
+			if(selectionType != null && selectionType.equals("Student Selection") && currentStudent != null) {
+				for(int dx = 0; dx < studentMap[0].length;dx++)
+					for(int dy = 0; dy < studentMap.length;dy++ ) {
+						if(currentStudent.equals(studentMap[dy][dx])) {
+							//System.out.println(dx+" "+dy);
+							canvas.setRGB(dx, dy, (new Color(192,192,192)).getRGB());
+						}
+
+					}
+			}
+			
+			
+		}
 		
 	}
 }

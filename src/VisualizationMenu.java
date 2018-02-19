@@ -129,18 +129,18 @@ public class VisualizationMenu extends JMenuBar {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				v.selectionType = "Student Selection";
-				
+				v.redrawSankey();
 			}
 			
 		});
 		JRadioButtonMenuItem majorSelection = new JRadioButtonMenuItem("Major Selection");
 		majorSelection.setSelected(true);
-		studentSelection.addItemListener(new ItemListener() {
+		majorSelection.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				v.selectionType = "Major Selection";
-				
+				v.redrawSankey();
 			}
 			
 		});
