@@ -214,6 +214,21 @@ public class VisualizationMenu extends JMenuBar {
 		URMMenu.add(allURM);
 		this.add(URMMenu);
 		JMenu department = new JMenu("Department");
+		JRadioButtonMenuItem remainInDepartment = new JRadioButtonMenuItem("Remains In department");
+		remainInDepartment.addItemListener(new VisualItemListener(this,v));
+		JRadioButtonMenuItem leaveDepartment = new JRadioButtonMenuItem("Leaves Department");
+		leaveDepartment.addItemListener(new VisualItemListener(this,v));
+		JRadioButtonMenuItem departmentAll = new JRadioButtonMenuItem("All");
+		departmentAll.setSelected(true);
+		departmentAll.addItemListener(new VisualItemListener(this,v));
+		ButtonGroup departmentGroup = new ButtonGroup();
+		departmentGroup.add(remainInDepartment);
+		departmentGroup.add(leaveDepartment);
+		departmentGroup.add(departmentAll);
+		department.add(remainInDepartment);
+		department.add(leaveDepartment);
+		department.add(departmentAll);
+		department.addSeparator();
 		for(String s: majors) {
 			if(d.hasMajor(s)) {
 				JCheckBoxMenuItem  major = new JCheckBoxMenuItem (s);
@@ -223,6 +238,21 @@ public class VisualizationMenu extends JMenuBar {
 		}
 		this.add(department);
 		JMenu college = new JMenu("College");
+		JRadioButtonMenuItem remainInCollege = new JRadioButtonMenuItem("Remains In college");
+		remainInCollege.addItemListener(new VisualItemListener(this,v));
+		JRadioButtonMenuItem leaveCollege = new JRadioButtonMenuItem("Leaves College");
+		leaveCollege.addItemListener(new VisualItemListener(this,v));
+		JRadioButtonMenuItem collegeAll = new JRadioButtonMenuItem("All");
+		collegeAll.setSelected(true);
+		collegeAll.addItemListener(new VisualItemListener(this,v));
+		ButtonGroup collegeGroup = new ButtonGroup();
+		collegeGroup.add(remainInCollege);
+		collegeGroup.add(leaveCollege);
+		collegeGroup.add(collegeAll);
+		college.add(remainInCollege);
+		college.add(leaveCollege);
+		college.add(collegeAll);
+		college.addSeparator();
 		for(String s: majors) {
 			if(!d.hasMajor(s) && Department.isCNS(s)) {
 				JCheckBoxMenuItem  major = new JCheckBoxMenuItem (s);
@@ -241,6 +271,21 @@ public class VisualizationMenu extends JMenuBar {
 		}
 		this.add(otherColleges);
 		JMenu other = new JMenu("Other");
+		JRadioButtonMenuItem remainInUT = new JRadioButtonMenuItem("Remains In uT");
+		remainInUT.addItemListener(new VisualItemListener(this,v));
+		JRadioButtonMenuItem leaveUT = new JRadioButtonMenuItem("Leaves UT");
+		leaveUT.addItemListener(new VisualItemListener(this,v));
+		JRadioButtonMenuItem uTAll = new JRadioButtonMenuItem("All");
+		uTAll.setSelected(true);
+		uTAll.addItemListener(new VisualItemListener(this,v));
+		ButtonGroup otherGroup = new ButtonGroup();
+		otherGroup.add(remainInUT);
+		otherGroup.add(leaveUT);
+		otherGroup.add(uTAll);
+		other.add(remainInUT);
+		other.add(leaveUT);
+		other.add(uTAll);
+		other.addSeparator();
 		for(String s: majors) {
 			if(!d.hasMajor(s) && !Department.isCNS(s) && !Department.isMajor(s)) {
 				JCheckBoxMenuItem  major = new JCheckBoxMenuItem (s);
@@ -249,6 +294,7 @@ public class VisualizationMenu extends JMenuBar {
 			}
 		}
 		this.add(other);
+		
 		
 	}
 }

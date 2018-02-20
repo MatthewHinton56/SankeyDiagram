@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ItemEvent;
@@ -19,6 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 
@@ -38,11 +40,12 @@ public class Visualization extends JPanel{
 	Cohort displayCohort;
 	private String[][] majorMap;
 	private ArrayList<ArrayList<Student>> studentTowers;
-
+	public int displayCount;
 	private BufferedImage canvas;
 	int height;
 	int width;
 	private Student[][] studentMap;
+	public String title = "Sankey Diagram";
 	public Visualization(int width, int height) {
 		this.addMouseMotionListener(new VisualMouseListener());
 		this.addMouseListener(new VisualMouseClickListener());
@@ -58,6 +61,7 @@ public class Visualization extends JPanel{
 		}
 		cohort  = new Cohort(selectedFile);
 		displayCohort = cohort;
+		displayCount = cohort.getTotalStudents().size();
 		generateStudentTowers(displayCohort.getTotalStudents());
 		constructColorMap();
 		canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -151,7 +155,7 @@ public class Visualization extends JPanel{
 		int y = 50;
 		for(String major: displayCohort.getMajors()) {
 			Color c = majorColors.get(major);
-			System.out.println(c);
+			//System.out.println(c);
 			this.drawRectangle(x, y+20, x+20, y, c, major);
 		//	for(int x0 = x; x0 < x+20; x0++)
 			//	for(int y0 = y; y0 < y+20; y0++)
@@ -168,6 +172,7 @@ public class Visualization extends JPanel{
 	private void drawKeyText(Graphics2D g2) {
 		int x = 50;
 		int y = 50;
+		g2.setFont(new Font("Arial", Font.BOLD, 20));
 		for(String major: displayCohort.getMajors()) {
 			g2.setColor(Color.BLACK);
 			g2.drawString(major, x+20, y+20);
@@ -177,7 +182,19 @@ public class Visualization extends JPanel{
 				x+=100;
 			}
 		}
-
+		
+		g2.drawString(displayCount+" / "+cohort.getTotalStudents().size(), 50, 20);
+		int yearX = 0;
+		for(int i = 0; i < 8; i ++) {
+			 yearX = 50 + 200*i;
+			 if(i == 0)
+			 g2.drawString("Intital", yearX, 720);
+			 else 
+			g2.drawString("Year: "+ i, yearX, 720);	 
+			 
+		}
+		g2.setFont(new Font("Arial", Font.BOLD, 50));
+		g2.drawString(title, x+100, 190);
 	}
 
 	public void putPixel(int x, int y) {
@@ -535,13 +552,54 @@ class VisualItemListener implements ItemListener {
 		Cohort temp = new Cohort(visual.cohort.getBaseYear(),visual.cohort.getDepartmentName());
 		ArrayList<Student> students = getSubset(visual.cohort);
 		for(Student s: students) {
+			
+			boolean leavesDepartment = false;
+			boolean leavesCollege = false;
+			boolean leavesUT = false;
+			int pos = -1;
+			while(!leavesDepartment && pos < s.getMajorAfterEachYear().size()) {
+				leavesDepartment = !visual.cohort.getDepartment().hasMajor(s.getYear(pos));
+				pos++;
+			}
+			pos = -1;
+			while(!leavesCollege  && pos < s.getMajorAfterEachYear().size()) {
+				leavesCollege = !Department.isCNS(s.getYear(pos));
+				pos++;
+			}
+			pos = -1;
+			while(!leavesUT  && pos < s.getMajorAfterEachYear().size()) {
+				leavesUT = !Department.isMajor(s.getYear(pos));
+				pos++;
+			}
 			boolean isInSubSet = true;
+			boolean hasToRemainDepartment = menuBar.getMenu(4).getItem(0).isSelected();
+			boolean hasToLeaveDepartment = menuBar.getMenu(4).getItem(1).isSelected();
+			boolean hasToRemainCollege = menuBar.getMenu(5).getItem(0).isSelected();
+			boolean hasToLeaveCollege = menuBar.getMenu(5).getItem(1).isSelected();
+			boolean hasToRemainUt;
+			boolean hasToLeaveUt;
+			if(menuBar.getMenuCount() > 7) {
+				 hasToRemainUt = menuBar.getMenu(7).getItem(0).isSelected();
+				 hasToLeaveUt = menuBar.getMenu(7).getItem(1).isSelected(); 
+			} else {
+				 hasToRemainUt = false;
+				 hasToLeaveUt = false;
+			}
+			isInSubSet &= !hasToRemainDepartment || !leavesDepartment ;
+			isInSubSet &= !hasToLeaveDepartment || leavesDepartment;
+			isInSubSet &= !hasToRemainCollege || !leavesCollege;
+			isInSubSet &= !hasToLeaveCollege || leavesCollege;
+			isInSubSet &= !hasToRemainUt || !leavesUT;
+			isInSubSet &= !hasToLeaveUt || leavesUT;
 			for(int i = 4; i < menuBar.getMenuCount() && isInSubSet; i++) {
 				JMenu menu = menuBar.getMenu(i);
 				for(int q = 0; q < menu.getItemCount() && isInSubSet; q++) {
-					JCheckBoxMenuItem check = (JCheckBoxMenuItem)menu.getItem(q);
+					JMenuItem item = menu.getItem(q);
+					if(item instanceof JCheckBoxMenuItem) {
+					JCheckBoxMenuItem check = (JCheckBoxMenuItem)item;
 					boolean hasMajor = s.hasMajor(check.getText()) || !check.isSelected();
 					isInSubSet = hasMajor && isInSubSet;
+					}
 				}
 			}
 			//System.out.println(isInSubSet);
@@ -549,6 +607,7 @@ class VisualItemListener implements ItemListener {
 			if(isInSubSet)
 				temp.addStudent(s);
 		}
+		visual.displayCount = temp.getTotalStudents().size();
 		visual.displayCohort = temp;
 		//System.out.println(temp);
 		visual.redrawSankey();
