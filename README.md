@@ -33,3 +33,5 @@ The graph provides a number of options, for enhanced visualizations.
 | Save | Saves an png of the Sankey graph |
 | Load | No functionality yet |
 
+## Current Glitches and errors
+Takes a second to initialize, but once online runs fine
