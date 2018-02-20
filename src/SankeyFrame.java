@@ -14,7 +14,7 @@ public class SankeyFrame extends JFrame{
 
 	public SankeyFrame() {
 		visual = new Visualization(1600, 800);
-		JFrame frame = new JFrame();
+		JFrame frame = new JFrame("Sankey Visualization");
 		frame.add(visual);
 		frame.setJMenuBar(new VisualizationMenu(visual.cohort.getMajors(),visual.cohort.getDepartment(),visual,this));
         frame.pack();
